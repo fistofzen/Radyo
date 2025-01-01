@@ -21,18 +21,34 @@ const HomeScreen = ({ navigation }) => {
         player.pause(() => {
           console.log('Stream paused');
           setIsPlaying(false);
-          if (player) {
-            player.destroy();
-            setPlayer(null);
-          }
         });
       } else {
         setIsLoading(true);
-        player.play(() => {
-          console.log('Stream playing');
-          setIsPlaying(true);
-          setIsLoading(false);
-        });
+        if (!player) {
+          const streamPlayer = new Player(currentStation.streamUrl, {
+            autoDestroy: false,
+            continuesToPlayInBackground: true,
+            mixWithOthers: true,
+          });
+          streamPlayer.prepare((err) => {
+            if (err) {
+              console.log('Error preparing player:', err);
+              setIsLoading(false);
+              return;
+            }
+            setPlayer(streamPlayer);
+            streamPlayer.play(() => {
+              setIsPlaying(true);
+              setIsLoading(false);
+            });
+          });
+        } else {
+          player.play(() => {
+            console.log('Stream playing');
+            setIsPlaying(true);
+            setIsLoading(false);
+          });
+        }
       }
     } catch (err) {
       console.log('Playback error:', err);
@@ -85,15 +101,15 @@ const HomeScreen = ({ navigation }) => {
       genre: 'Rock',
       image: 'https://example.com/station2.jpg',
       listeners: '3.1k',
-      streamUrl: 'https://stream.radyo45lik.com:4545'
+      streamUrl: 'https://trt.radyotvonline.net/trtfm'
     },
     {
       id: '3',
-      name: 'Classical FM',
+      name: 'Karadeniz FM',
       genre: 'Classical',
       image: 'https://example.com/station3.jpg',
       listeners: '1.8k',
-      streamUrl: 'https://stream.example.com/classical'
+      streamUrl: 'https://moondigitaledge.radyotvonline.net/karadenizfm/playlist.m3u8'
     }
   ];
 
