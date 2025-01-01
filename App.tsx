@@ -1,118 +1,111 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Image } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// Import screens
+import HomeScreen from './src/screens/HomeScreen';
+import StationsScreen from './src/screens/StationsScreen';
+import PlayerScreen from './src/screens/PlayerScreen';
+import FavoritesScreen from './src/screens/FavoritesScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const HomeStack = () => {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="HomeScreen" 
+        component={HomeScreen} 
+        options={{ headerShown: false }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <Stack.Screen 
+        name="Player" 
+        component={PlayerScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const App = () => {
+  return (
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconSource;
+
+              if (route.name === 'Home') {
+                iconSource = focused
+                  ? require('./src/assets/icons/home-filled.png')
+                  : require('./src/assets/icons/home.png');
+              } else if (route.name === 'Stations') {
+                iconSource = focused
+                  ? require('./src/assets/icons/radio-filled.png')
+                  : require('./src/assets/icons/radio.png');
+              } else if (route.name === 'Player') {
+                iconSource = focused
+                  ? require('./src/assets/icons/play-filled.png')
+                  : require('./src/assets/icons/play.png');
+              } else if (route.name === 'Favorites') {
+                iconSource = focused
+                  ? require('./src/assets/icons/heart-filled.png')
+                  : require('./src/assets/icons/heart.png');
+              } else if (route.name === 'Profile') {
+                iconSource = focused
+                  ? require('./src/assets/icons/user-filled.png')
+                  : require('./src/assets/icons/user.png');
+              }
+
+              return <Image source={iconSource} style={{ width: size, height: size, tintColor: color }} />;
+            },
+            tabBarActiveTintColor: '#000',
+            tabBarInactiveTintColor: '#666',
+            tabBarStyle: {
+              paddingBottom: 5,
+              height: 60,
+            },
+            tabBarLabelStyle: {
+              fontSize: 12,
+              marginTop: -5,
+            },
+          })}
+        >
+          <Tab.Screen 
+            name="Home" 
+            component={HomeStack}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen 
+            name="Stations" 
+            component={StationsScreen}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen 
+            name="Player" 
+            component={PlayerScreen}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen 
+            name="Favorites" 
+            component={FavoritesScreen}
+            options={{ headerShown: false }}
+          />
+          <Tab.Screen 
+            name="Profile" 
+            component={ProfileScreen}
+            options={{ headerShown: false }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
+  );
+};
 
 export default App;
