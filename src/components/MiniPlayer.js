@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import WaveAnimation from './WaveAnimation';
 
 const MiniPlayer = ({ 
   isPlaying, 
@@ -20,6 +21,7 @@ const MiniPlayer = ({
             <Text style={styles.title}>{station?.name}</Text>
             <Text style={styles.subtitle}>{station?.genre}</Text>
           </View>
+          <WaveAnimation isPlaying={isPlaying} />
         </View>
 
         <TouchableOpacity 
@@ -45,7 +47,7 @@ const MiniPlayer = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 85, // Height of tab bar
+    bottom: 0,
     left: 0,
     right: 0,
     backgroundColor: '#fff',
@@ -65,35 +67,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 12,
+    padding: 16,
+    paddingBottom: 12,
+    height: 80,
   },
   info: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    gap: 12,
   },
   textContainer: {
-    marginLeft: 12,
     flex: 1,
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: '#666',
-    marginTop: 2,
   },
   playButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
 });
 

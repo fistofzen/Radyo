@@ -21,6 +21,10 @@ const HomeScreen = ({ navigation }) => {
         player.pause(() => {
           console.log('Stream paused');
           setIsPlaying(false);
+          if (player) {
+            player.destroy();
+            setPlayer(null);
+          }
         });
       } else {
         setIsLoading(true);
@@ -37,11 +41,11 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleStationPress = (station) => {
- 
     if (player) {
       player.destroy();
     }
     setIsLoading(true);
+    setShowMiniPlayer(true);
     const streamPlayer = new Player(station.streamUrl, {
       autoDestroy: false,
       continuesToPlayInBackground: true,
@@ -57,7 +61,6 @@ const HomeScreen = ({ navigation }) => {
 
       setPlayer(streamPlayer);
       setCurrentStation(station);
-      setShowMiniPlayer(true);
       setIsLoading(false);
       
       // Auto-play when ready
@@ -82,7 +85,7 @@ const HomeScreen = ({ navigation }) => {
       genre: 'Rock',
       image: 'https://example.com/station2.jpg',
       listeners: '3.1k',
-      streamUrl: 'https://stream.example.com/rock'
+      streamUrl: 'https://stream.radyo45lik.com:4545'
     },
     {
       id: '3',
@@ -198,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollContent: {
-    paddingBottom: 85,
+    paddingBottom: 80,
   },
   header: {
     flexDirection: 'row',
