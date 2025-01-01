@@ -2,7 +2,13 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const StationsScreen = ({ navigation }) => {
+const StationsScreen = ({ route }) => {
+  const { onStationPress } = route.params;
+
+  const handleStationPress = (station) => {
+    onStationPress(station);
+  };
+
   const stations = [
     { id: '1', name: 'Jazz FM', genre: 'Jazz', image: 'https://example.com/station1.jpg' },
     // Add more stations
@@ -11,7 +17,7 @@ const StationsScreen = ({ navigation }) => {
   const renderStation = ({ item }) => (
     <TouchableOpacity 
       style={styles.stationItem}
-      onPress={() => navigation.navigate('Player')}
+      onPress={() => handleStationPress(item)}
     >
       <Image source={{ uri: item.image }} style={styles.stationImage} />
       <View style={styles.stationInfo}>

@@ -1,10 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Player } from '@react-native-community/audio-toolkit';
+import MiniPlayer from '../components/MiniPlayer';
 
 const HomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [player, setPlayer] = useState(null);
+  const [currentStation, setCurrentStation] = useState(null);
+  const [showMiniPlayer, setShowMiniPlayer] = useState(false);
+
+  const handlePlayPause = () => {
+    if (!player || isLoading) return;
+    
+    try {
+      if (isPlaying) {
+        player.pause(() => {
+          console.log('Stream paused');
+          setIsPlaying(false);
+        });
+      } else {
+        setIsLoading(true);
+        player.play(() => {
+          console.log('Stream playing');
+          setIsPlaying(true);
+          setIsLoading(false);
+        });
+      }
+    } catch (err) {
+      console.log('Playback error:', err);
+      setIsLoading(false);
+    }
+  };
+
+  const handleStationPress = (station) => {
+ 
+    if (player) {
+      player.destroy();
+    }
+    setIsLoading(true);
+    const streamPlayer = new Player(station.streamUrl, {
+      autoDestroy: false,
+      continuesToPlayInBackground: true,
+      mixWithOthers: true,
+    });
+
+    streamPlayer.prepare((err) => {
+      if (err) {
+        console.log('Error preparing player:', err);
+        setIsLoading(false);
+        return;
+      }
+
+      setPlayer(streamPlayer);
+      setCurrentStation(station);
+      setShowMiniPlayer(true);
+      setIsLoading(false);
+      
+      // Auto-play when ready
+      streamPlayer.play(() => {
+        setIsPlaying(true);
+      });
+    });
+  };
 
   const featuredStations = [
     {
@@ -12,21 +73,24 @@ const HomeScreen = ({ navigation }) => {
       name: 'Smooth Jazz',
       genre: 'Jazz',
       image: 'https://example.com/station1.jpg',
-      listeners: '2.5k'
+      listeners: '2.5k',
+      streamUrl: 'https://stream.radyo45lik.com:4545'
     },
     {
       id: '2',
       name: 'Rock Radio',
       genre: 'Rock',
       image: 'https://example.com/station2.jpg',
-      listeners: '3.1k'
+      listeners: '3.1k',
+      streamUrl: 'https://stream.example.com/rock'
     },
     {
       id: '3',
       name: 'Classical FM',
       genre: 'Classical',
       image: 'https://example.com/station3.jpg',
-      listeners: '1.8k'
+      listeners: '1.8k',
+      streamUrl: 'https://stream.example.com/classical'
     }
   ];
 
@@ -62,7 +126,7 @@ const HomeScreen = ({ navigation }) => {
           style={styles.nowPlayingBar}
           onPress={() => navigation.navigate('Player')}
         >
-          <Icon name="wave-animation" size={24} color="#000" />
+          <Icon name="radio-outline" size={24} color="#000" />
           <Text style={styles.nowPlayingText}>Now Playing: Smooth Jazz</Text>
           <TouchableOpacity style={styles.miniPlayButton}>
             <Icon name="pause" size={16} color="#fff" />
@@ -82,7 +146,7 @@ const HomeScreen = ({ navigation }) => {
               <TouchableOpacity 
                 key={station.id}
                 style={styles.featuredCard}
-                onPress={() => navigation.navigate('Player')}
+                onPress={() => handleStationPress(station)}
               >
                 <Image
                   source={{ uri: station.image }}
@@ -115,6 +179,15 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+
+      {showMiniPlayer && (
+        <MiniPlayer
+          isPlaying={isPlaying}
+          isLoading={isLoading}
+          onPlayPause={handlePlayPause}
+          station={currentStation}
+        />
+      )}
     </View>
   );
 };
